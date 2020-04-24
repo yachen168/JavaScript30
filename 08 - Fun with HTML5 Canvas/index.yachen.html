@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>HTML5 Canvas</title>
+</head>
+
+<body>
+    <canvas id="draw" width="800" height="800"></canvas>
+    <script>
+        const canvas = document.querySelector('#draw');
+        // 建立 2 維的上下文
+        const contextType = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        contextType.strokeStyle = '#BADA55';
+        // 連接處形狀
+        contextType.lineJoin = 'round';
+        // 結尾處形狀
+        contextType.lineCap = 'round';
+        contextType.lineWidth = 20;
+        // contextType.globalCompositeOperation = 'multiply';
+
+        let isDrawing = false;
+        let lastX = 0;
+        let lastY = 0;
+        // 初始化顏色(hsl)
+        let hue = 0;
+        let direction = true;
+
+        function draw(e) {
+            // 若無按著滑鼠，則不執行
+            if (!isDrawing) return;
+            // 線條顏色
+            contextType.strokeStyle = `hsl(${hue}, 100%, 50%)`;
+            // 開始繪圖
+            contextType.beginPath();
+            // start from
+            contextType.moveTo(lastX, lastY);
+            // go to
+            contextType.lineTo(e.offsetX, e.offsetY);
+            contextType.stroke();
+            [lastX, lastY] = [e.offsetX, e.offsetY];
+
+            hue++;
+            if (hue > 360) {
+                hue = 0;
+            }
+
+            if (contextType.lineWidth >= 100 || contextType.lineWidth <= 1) {
+                direction = !direction;
+            }
+            // 線條寬度 >= 100 則遞減，<= 1 則遞增
+            if (direction) {
+                contextType.lineWidth++;
+            } else {
+                contextType.lineWidth--;
+            }
+        }
+
+        canvas.addEventListener('mousedown', (e) => {
+            isDrawing = true;
+            [lastX, lastY] = [e.offsetX, e.offsetY];
+        });
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('mouseup', () => isDrawing = false);
+        // 按著滑鼠但之後滑鼠移出視窗
+        canvas.addEventListener('mouseout', () => isDrawing = false);
+    </script>
+
+    <style>
+        html,
+        body {
+            margin: 0;
+        }
+    </style>
+
+</body>
+
+</html>
